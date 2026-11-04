@@ -1,0 +1,73 @@
+{
+  "scope": "Real recorded MLX temperature arrays, replayed offline; no high-resolution ground truth.",
+  "checkpoint_sha256": "e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be",
+  "noise_profile_sha256": "2fb936fa76c0e457ff35ad3ecca05f387b8f98fc3f65e028516d83c5b30455c6",
+  "motion": {
+    "file": "motion_20261103T140119_035916Z.npz",
+    "sha256": "2e50ea8e8c9175ccd15835a4902162cadd7c93168c3d7c7af1e5becdbedd0cd8",
+    "frames": 275,
+    "preview_frame_zero_based": 62,
+    "preview_elapsed_s": 8.038409116001276,
+    "deinterlaced_array_sha256": "12fb73c30e4ece62701a7dea7103a2e87569efd436e220174d7555ae8d491791",
+    "latest_observation_contract_checked_every_frame": true,
+    "repair_samples": 21197
+  },
+  "static": {
+    "file": "static_20261103T034021_165175Z.npz",
+    "sha256": "a6101a4798d27d87d4af9aec8f8573c2ffa1915d87f6523fb8fa58713aac3a6c",
+    "frames": 236,
+    "analysis_interval_s": [
+      5.0,
+      30.0
+    ],
+    "analysis_frames": 196,
+    "statistic": "Mean per-pixel temporal population standard deviation; ddof=0.",
+    "mean_temporal_std_c": {
+      "raw_temperature_c": 0.5842514183908273,
+      "deinterlaced_c": 0.5842514183908273,
+      "native_temporal_c": 0.36878761649131775,
+      "sr_temperature_c": 0.5198331475257874,
+      "final_temperature_c": 0.33303186297416687,
+      "pre_cnn_temperature_c": 0.3368689715862274
+    },
+    "repaired_samples_entire_recording": 0
+  },
+  "display": {
+    "color_limits_c": [
+      29.5,
+      36.5
+    ],
+    "colormap": "inferno",
+    "enlargement": "nearest-neighbor, same physical extent per panel",
+    "panel_order": [
+      "deinterlaced_c",
+      "sr_temperature_c",
+      "final_temperature_c",
+      "deinterlaced_c",
+      "native_temporal_c",
+      "pre_cnn_temperature_c"
+    ]
+  },
+  "image": {
+    "file": "pipeline_comparison.png",
+    "sha256": "3d755f82007a8bb781382134fc0b55c8daa7df7566e9bf753d8b72e55da500e7"
+  },
+  "animation": {
+    "file": "motion_deinterlacing.gif",
+    "sha256": "c81d6c3468d3c9845367d565bdf92b35994c2dbbbbafb066bf4b0033d56163c8",
+    "source_recording_sha256": "2e50ea8e8c9175ccd15835a4902162cadd7c93168c3d7c7af1e5becdbedd0cd8",
+    "source_frames_zero_based": [
+      117,
+      159
+    ],
+    "source_interval_s": [
+      15.0,
+      20.5
+    ],
+    "frames": 43,
+    "duration_ms": 5490,
+    "playback_speed": 1.0,
+    "rendering": "nearest-neighbor integer enlargement; no interpolation, frame blending or dithering",
+    "deinterlaced_replay_matches_current_package": true
+  }
+}

@@ -57,7 +57,8 @@ footer{border-top:1px solid #dce5e2;margin-top:34px;padding-top:15px}@media(max-
 <tr><td><code>best.pt</code></td><td><code>e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be</code></td></tr>
 <tr><td><code>selected_model.onnx</code></td><td><code>1f8b16619252d806a9511661eb985bb1eb4b63c73467fca8746ee823d79cc617</code></td></tr>
 </table></div>
-<p>权重不包含在公共源码 ZIP 或 Git 跟踪列表中。作者本地已有的权重可以放在被忽略的 <code>local_assets/</code> 中使用；源码不自动联网下载模型。</p>
+<p>预训练权重通过 <a href="https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0">GitHub Release</a> 独立提供，不嵌入 Git 源码。下载 <a href="https://github.com/A1les/mlx90640_SR/releases/download/model-v0.1.0/thermal_sr_x2_epoch22.pt">PyTorch 检查点</a>或<a href="https://github.com/A1les/mlx90640_SR/releases/download/model-v0.1.0/thermal_sr_x2_epoch22.onnx">ONNX 推理模型</a>，也可使用 <code>tools/download_model.py</code> 自动验证大小和 SHA256。完整下载清单见 <a href="../../configs/pretrained.json">pretrained.json</a>。</p>
+<p>上表记录历史原件哈希。公开 PyTorch 文件与历史选中检查点逐字节一致。公开 ONNX 删除了节点调试元数据中的工作站路径，计算图与张量字段字节保持不变；公开文件 SHA256 为 <code>19a880fae99bfaf1d3dcdf4d670244ef3d8b9cf8fa8950a555adecca0c4ca265</code>，大小为 73,060 bytes。<code>tools/verify_model_release.py</code> 对公开下载文件执行 SHA256、输入输出形状及 16 个输入的 CPU PyTorch/ONNX 一致性检查。</p>
 <h3>输入、输出与结构</h3>
 <p>输入为摄氏度 float32 <code>[N,1,24,32]</code>，输出为估计摄氏度 <code>[N,1,48,64]</code>。ONNX 发行模型的 N 固定为 1。输入布局为原始行列排列，不旋转、不翻转、不做颜色归一化。</p>
 <p>卷积通道为 1→24→24→24→24→4，全部 3×3、stride 1、padding 1，前四层后接 ReLU。输出通过 PixelShuffle(2) 重排。网络学习 <code>(T−mean(T))/10</code> 上的残差，并将残差乘 10 后加到原温度的双线性插值上。末层零初始化。该结构没有时序输入，过去帧只在独立 EMA 中使用。</p>
@@ -70,7 +71,7 @@ footer{border-top:1px solid #dce5e2;margin-top:34px;padding-top:15px}@media(max-
 <p>源码迁移后模型结构、参数数量、初始化行为、温度平移性质与反向传播均有自动检查。真实录像回归使用同一个冻结 PyTorch 模型隔离代码整理造成的差异。历史树莓派 ONNX 一致性记录与本次包级回归是不同验证任务；新导出文件应重新执行数值校验和目标设备性能测试。</p></section>
 <section id="training"><h2>数据准备、训练、评价与导出</h2>
 <h3>数据来源与划分</h3>
-<p>从 <a href="https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/home">MlGesture 官方入口</a> 自行取得归档，并遵守发布方使用条件。仓库不内嵌训练图像。当前预处理针对已审查的 <code>MlGesture.zip</code> 版本，SHA256 为 <code>36020b89e29312ec3fed46b5ea85b9a407a538ba3f8387fea8f4dd153c0c93d8</code>。</p>
+<p>从 <a href="https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/home">MlGesture 官方入口</a>或<a href="https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file">官方 ZIP 直链</a>取得归档，并遵守发布方使用条件。直链已于 2026-11-04 验证为可读取的 ZIP，大小为 1,591,541,835 bytes。官方页面的旧 <code>at_download/file</code> 链接当前返回 404，实际可用的是 <code>@@download/file</code>。仓库不内嵌训练图像。当前预处理针对已审查的 <code>MlGesture.zip</code> 版本，SHA256 为 <code>36020b89e29312ec3fed46b5ea85b9a407a538ba3f8387fea8f4dd153c0c93d8</code>，机器可读记录见 <a href="../../configs/dataset.json">dataset.json</a>。</p>
 <p>程序审查 <code>train_val/frame_data</code> 中两个视角的 Lepton 和 MLX90640 TIFF。两者分别按 signed int16 /100、/10 转为摄氏度。检查形状、数值有效性和跨集合完全重复帧；边缘、端点及孤立跳变仅作为诊断标记，不任意删除真实温度结构。Lepton 160×120 按面积重采样为 64×48 参考目标；MLX90640 仅用于原生输入审查和无配对推理。</p>
 <div class="table"><table>
 <tr><th>集合</th><th>受试者</th><th>Lepton 帧数</th></tr>
@@ -150,7 +151,7 @@ mlx90640-pipeline calibrate captures/static_session/capture_0000.npz --start 5 -
 <p>检查涵盖最新子页和未选中观测的逐字节保留、错误标定拒绝、子页时间异常、帧间断和逆序重置、静态 EMA 噪声下降、场景突变旁路、两类子页邻域释放、直流场保持、无 pickle 录像往返和不覆盖保存、渲染不修改温度、模型参数量/初始化/平移性质/有限梯度，以及采集适配器对父类转换的保留。</p>
 <p>命令为 <code>python -m unittest discover -s tests -v</code>。基础环境缺少 PyTorch 时相关模型测试明确跳过；发布核查在已有深度学习环境中运行全部测试。检查记录与数据预处理比对见本目录 JSON 报告。</p>
 <div class="table"><table>
-<tr><th>检查</th><th>本次结果</th><th>记录</th></tr>
+<tr><th>检查</th><th>初始源码整理结果</th><th>记录</th></tr>
 <tr><td>原版本回归</td><td>511 帧、14 项数组与全部状态一致</td><td><a href="../validation/legacy_regression.json">回归记录</a></td></tr>
 <tr><td>全量数据准备</td><td>219,243 帧审查，缓存与划分内容一致</td><td><a href="../validation/data_preparation.json">数据记录</a></td></tr>
 <tr><td>自动测试</td><td>13 项通过、0 跳过</td><td><a href="../validation/local_checks.json">环境与测试</a></td></tr>
@@ -159,6 +160,7 @@ mlx90640-pipeline calibrate captures/static_session/capture_0000.npz --start 5 -
 </table></div>
 <p>完整预处理比较保留了数值字节级检查；发布用受试者 CSV 规范为无 BOM 的 UTF-8 与 LF，文本字节不同，但逐条分配记录相同。单轮小样本训练只验证程序连接，不替代历史 24 轮训练与测试结果。ONNX 导出和新采集入口的实体设备验收不计入本次已通过项目。</p>
 <p>2026-11-04，首次公开上传提交 <code>c4c1b34ecde022f1d1b752c018575bd54277bcfc</code> 的 GitHub Actions 基础检查和 CPU 模型检查均通过，见<a href="https://github.com/A1les/mlx90640_SR/actions/runs/41799421371">首次远程运行记录</a>。其中包括基础演示、源码审查、单元测试和合成小样本训练与评价。<code>local_checks.json</code> 中的 <code>ci_status_at_local_packaging</code> 保留上传前的历史状态；后续提交的检查结果以<a href="https://github.com/A1les/mlx90640_SR/actions">对应远程运行</a>为准。</p>
+<p>模型公开发布时新增 3 项下载完整性测试，检查同长度损坏、截断拒绝和有效字节保留；本地全部 16 项测试通过。CPU 模型 CI 另外下载公开权重，核验文件 SHA256，并使用 4 个常温/不同温度的常量输入和 12 个随机输入检查 PyTorch/ONNX 数值差异小于 0.001°C。首页使用的真实录像重新经过当前包计算，图像来源、区间和时间标准差见<a href="../assets/showcase.json">展示记录</a>，完整合成测试指标见<a href="../validation/synthetic_test_results.json">测试数据</a>。</p>
 <h3>历史实验与本次检查的区别</h3>
 <p>历史选中 CNN 的合成 matched 测试相对 bicubic 的 MAE 降低约 27.31%，边缘误差降低约 23.97%。该结果相对于 Lepton 合成参考，不能解释为 MLX 绝对测温精度。历史静态录像中两个顺序的最终平均时间标准差约为 0.2848°C 和 0.2819°C，属于该指定录像的时间稳定性统计。</p>
 <p>源程序曾在树莓派进行实时展示，当前整理后的包级采集入口尚未做新一轮实体设备验收。已完成的离线回归、模型结构检查和模拟驱动检查分别报告，不合并为“全部硬件验收通过”。</p>

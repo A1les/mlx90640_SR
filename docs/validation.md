@@ -20,7 +20,7 @@ python tools/compare_legacy.py --study /path/to/legacy/study --release /path/to/
 
 命令为 `python -m unittest discover -s tests -v`。基础环境缺少 PyTorch 时相关模型测试明确跳过；发布核查在已有深度学习环境中运行全部测试。检查记录与数据预处理比对见本目录 JSON 报告。
 
-| 检查 | 本次结果 | 记录 |
+| 检查 | 初始源码整理结果 | 记录 |
 |---|---|---|
 | 原版本回归 | 511 帧、14 项数组与全部状态一致 | [回归记录](validation/legacy_regression.json) |
 | 全量数据准备 | 219,243 帧审查，缓存与划分内容一致 | [数据记录](validation/data_preparation.json) |
@@ -31,6 +31,8 @@ python tools/compare_legacy.py --study /path/to/legacy/study --release /path/to/
 完整预处理比较保留了数值字节级检查；发布用受试者 CSV 规范为无 BOM 的 UTF-8 与 LF，文本字节不同，但逐条分配记录相同。单轮小样本训练只验证程序连接，不替代历史 24 轮训练与测试结果。ONNX 导出和新采集入口的实体设备验收不计入本次已通过项目。
 
 2026-11-04，首次公开上传提交 `c4c1b34ecde022f1d1b752c018575bd54277bcfc` 的 GitHub Actions 基础检查和 CPU 模型检查均通过，见[首次远程运行记录](https://github.com/A1les/mlx90640_SR/actions/runs/41799421371)。其中包括基础演示、源码审查、单元测试和合成小样本训练与评价。`local_checks.json` 中的 `ci_status_at_local_packaging` 保留上传前的历史状态；后续提交的检查结果以[对应远程运行](https://github.com/A1les/mlx90640_SR/actions)为准。
+
+模型公开发布时新增 3 项下载完整性测试，检查同长度损坏、截断拒绝和有效字节保留；本地全部 16 项测试通过。CPU 模型 CI 另外下载公开权重，核验文件 SHA256，并使用 4 个常温/不同温度的常量输入和 12 个随机输入检查 PyTorch/ONNX 数值差异小于 0.001°C。首页使用的真实录像重新经过当前包计算，图像来源、区间和时间标准差见[展示记录](assets/showcase.json)，完整合成测试指标见[测试数据](validation/synthetic_test_results.json)。
 
 ## 历史实验与本次检查的区别
 

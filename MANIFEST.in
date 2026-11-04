@@ -1,4 +1,4 @@
 include LICENSE
 include THIRD_PARTY_NOTICES.md
 recursive-include configs *.json *.csv
-recursive-include docs *.md *.html *.json
+recursive-include docs *.md *.html *.json *.svg *.png *.gif

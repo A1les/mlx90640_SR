@@ -12,6 +12,10 @@ TOP_FILES = {'README.md','README.en.md','LICENSE','THIRD_PARTY_NOTICES.md',
 TOP_DIRS = {'src','tests','tools','docs','configs','.github'}
 IGNORED_PARTS = {'__pycache__','.pytest_cache','.git','build','dist'}
 ALLOWED_SUFFIXES = {'.py','.md','.json','.html','.svg','.csv','.yml','.yaml','.toml','.cff','.in'}
+PUBLIC_MEDIA = {
+    'docs/assets/motion_deinterlacing.gif': b'GIF89a',
+    'docs/assets/pipeline_comparison.png': b'\x89PNG\r\n\x1a\n',
+}
 SENSITIVE = {
     'private_key': re.compile(r'-----BEGIN (?:OPENSSH |RSA |EC )?PRIVATE KEY-----'),
     'github_token': re.compile(r'\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}'),
@@ -42,6 +46,12 @@ def audit(root=ROOT):
             errors.append(f'Missing required file: {required}')
     for p in files:
         rel=p.relative_to(root).as_posix()
+        if rel in PUBLIC_MEDIA:
+            with p.open('rb') as stream:
+                signature = stream.read(len(PUBLIC_MEDIA[rel]))
+            if signature != PUBLIC_MEDIA[rel] or p.stat().st_size > 5_000_000:
+                errors.append(f'Invalid or oversized showcase media: {rel}')
+            continue
         if p.name not in TOP_FILES and p.suffix not in ALLOWED_SUFFIXES:
             errors.append(f'Unexpected public file type: {rel}')
             continue
@@ -65,7 +75,7 @@ def audit(root=ROOT):
             except json.JSONDecodeError: errors.append(f'Invalid JSON: {rel}')
         links=[]
         if p.suffix == '.md':
-            links=re.findall(r'(?<!!)\[[^\]]+\]\(([^)]+)\)',text)
+            links=re.findall(r'!?\[[^\]]*\]\(([^)]+)\)',text)
         elif p.suffix == '.html':
             links=re.findall(r'(?:href|src)=["\']([^"\']+)["\']',text)
         for link in links:
