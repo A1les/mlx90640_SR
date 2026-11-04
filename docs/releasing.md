@@ -1,6 +1,6 @@
 # 本地发布与 GitHub 上传
 
-本次交付为本地准备完成的源码仓库，名称 `mlx90640-thermal-pipeline`，项目代码采用 MIT。没有自动创建远程仓库或上传数据。
+源码目标仓库为 [A1les/mlx90640_SR](https://github.com/A1les/mlx90640_SR)，项目代码采用 MIT。Python 分发名称保持为 `mlx90640-thermal-pipeline`，导入路径为 `mlx90640_pipeline`。本地提交和打包不代表远程上传成功；上传状态应以远程分支和文件清单核验为准。
 
 ## 内容边界
 
@@ -10,18 +10,20 @@
 
 ## 上传步骤
 
-在自己的 GitHub 账户创建空仓库 `mlx90640-thermal-pipeline`，选择需要的可见性，不在网页端额外生成 README 或 LICENSE。进入本地仓库后，确认文件清单与差异，再设置远程地址：
+目标空仓库 `A1les/mlx90640_SR` 已由维护者创建。进入本地源码仓库后，确认文件清单与差异；首次配置时将 `origin` 指向该仓库：
 
 ```bash
 git status --short
 python tools/audit_release.py
 git add .
 git commit -m "Prepare MLX90640 thermal pipeline source release"
-git remote add origin https://github.com/YOUR_ACCOUNT/mlx90640-thermal-pipeline.git
+git remote add origin https://github.com/A1les/mlx90640_SR.git
 git push -u origin main
 ```
 
-如果本地已存在初始提交，无需再次创建相同提交。只在远程仓库明确属于本项目时设置 `origin`。Git 凭据由用户已有 GitHub 登录方式管理，项目不保存令牌或 SSH 私钥。
+如果本地已存在提交，无需再次创建相同提交；如果 `origin` 已配置为上述地址，也无需重复添加。用 `git remote -v` 核实目标，再执行 `git push -u origin main`。Git 凭据由维护者已有 GitHub 登录方式管理，项目不保存令牌或 SSH 私钥。
+
+上传后检查远程 `main` 的提交、文件清单和 [GitHub Actions](https://github.com/A1les/mlx90640_SR/actions) 结果。基础与 CPU 模型工作流均成功后，才可报告该次远程检查通过；远程检查不包含实体传感器验收。
 
 ## 自检和打包
 

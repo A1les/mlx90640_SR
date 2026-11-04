@@ -13,6 +13,10 @@ license-files = ["LICENSE"]
 authors = [{name = "A1les"}]
 dependencies = ["numpy>=1.26,<3", "opencv-python>=4.8,<6"]
 
+[project.urls]
+Repository = "https://github.com/A1les/mlx90640_SR"
+Documentation = "https://github.com/A1les/mlx90640_SR/blob/main/README.md"
+
 [project.optional-dependencies]
 train = ["torch>=2.6,<3", "Pillow>=10,<13", "matplotlib>=3.8,<4"]
 onnx = ["onnxruntime>=1.20,<2"]

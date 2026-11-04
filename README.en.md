@@ -2,11 +2,15 @@
 
 Temperature-domain motion-adaptive deinterlacing, causal temporal denoising, and lightweight x2 CNN reconstruction for the 32×24 MLX90640. The two CNN/EMA orders share native motion weights and are available in a text-free 2×3 viewer.
 
+The GitHub repository is [A1les/mlx90640_SR](https://github.com/A1les/mlx90640_SR). The Python distribution is named `mlx90640-thermal-pipeline`; its CLI is `mlx90640-pipeline`.
+
 The active deinterlacer is `confirmed_frequency_repair_v3`. Only confirmed older-subpage locations can change. Latest-subpage observations and all unselected values remain byte-identical at the deinterlaced output. Subsequent EMA/CNN outputs are separately stored estimates.
 
 ## Quick start
 
 ```bash
+git clone https://github.com/A1les/mlx90640_SR.git
+cd mlx90640_SR
 python -m pip install .
 mlx90640-pipeline demo --output outputs/demo
 python -m unittest discover -s tests -v

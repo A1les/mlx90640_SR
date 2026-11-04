@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "If you use this project, cite its source release and the original methods and dataset listed in THIRD_PARTY_NOTICES.md."
 type: software
 title: "MLX90640 Thermal Pipeline"
+repository-code: "https://github.com/A1les/mlx90640_SR"
 authors:
   - name: "A1les"
 version: 0.1.0

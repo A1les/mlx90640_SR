@@ -4,6 +4,8 @@ MLX90640 原生温度处理：**保留观测的运动自适应去交错 → 运�
 
 [English](README.en.md) · [算法说明](docs/algorithms.md) · [训练复现](docs/training.md) · [树莓派运行](docs/raspberry-pi.md) · [验证范围](docs/validation.md) · [离线说明页](docs/offline/index.html)
 
+GitHub 仓库为 [A1les/mlx90640_SR](https://github.com/A1les/mlx90640_SR)。Python 分发名称为 `mlx90640-thermal-pipeline`，命令行入口为 `mlx90640-pipeline`。
+
 ## 范围与证据
 
 此仓库整理自已经运行的研究程序，活动去交错版本为 `confirmed_frequency_repair_v3`。它仅修改运动区域内较旧子页的选中像元，最新子页和其余位置的原始浮点数保持逐字节不变。EMA 和 CNN 的结果单独保存为派生估计，不继承去交错层的逐像元观测约束。
@@ -25,6 +27,8 @@ flowchart LR
 需要 Python 3.10 或更新版本。基础演示只依赖 NumPy 和 OpenCV，不需要传感器、模型权重或训练数据。
 
 ```bash
+git clone https://github.com/A1les/mlx90640_SR.git
+cd mlx90640_SR
 python -m pip install .
 mlx90640-pipeline demo --output outputs/demo
 ```
