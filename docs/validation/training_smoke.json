@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "synthetic": true,
+  "train_frames": 8,
+  "validation_frames": 8,
+  "test_frames": 8,
+  "epochs": 1,
+  "selected_epoch": 1,
+  "evaluated_conditions": 3,
+  "scope": "CLI training/backpropagation/checkpoint/evaluation smoke only; not model quality evidence"
+}

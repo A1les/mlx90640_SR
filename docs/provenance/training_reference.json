@@ -1,0 +1,135 @@
+{
+  "config": {
+    "seed": 20261101,
+    "epochs": 24,
+    "batch_size": 128,
+    "learning_rate": 0.001,
+    "weight_decay": 1e-05,
+    "model": {
+      "channels": 24,
+      "hidden_layers": 3,
+      "center_input": true
+    },
+    "loss_weights": {
+      "temperature": 1.0,
+      "edge": 0.2,
+      "consistency": 0.0
+    },
+    "blur_sigma_choices_hr_pixels": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "noise_std_uniform_c": [
+      0.0,
+      0.2
+    ],
+    "validation": {
+      "blur_sigma": 0.5,
+      "noise_std_c": 0.1,
+      "seed": 20261102
+    },
+    "test_conditions": [
+      {
+        "name": "matched",
+        "blur_sigma": 0.5,
+        "noise_std_c": 0.1
+      },
+      {
+        "name": "stronger_blur_noise",
+        "blur_sigma": 1.0,
+        "noise_std_c": 0.2
+      },
+      {
+        "name": "outside_training_degradation",
+        "blur_sigma": 1.5,
+        "noise_std_c": 0.3
+      }
+    ],
+    "test_seed": 20261103,
+    "degradation_status": "Initial hypotheses, NOT identified MLX optics/noise calibration.",
+    "reference_status": "Single-sensor Lepton synthetic LR/HR, NOT real MLX/HR supervision.",
+    "normalization_note": "Reversible temperature centering in residual branch only; original Celsius bilinear skip retained. Fixed scale10, no min-max normalization."
+  },
+  "train_frames": 54450,
+  "validation_frames": 13703,
+  "test_frames": 11742,
+  "parameters": 16732,
+  "source_hashes": {
+    "model.py": "f79dfb3a446712608cfeed52e3c24a5540b076d0d793791cc11661b522a884b0",
+    "train.py": "1a62f2a71d0d44898706431afc9bd7751997513028b6d6c46c3ebaac4a502531",
+    "experiment.py": "0f5d1474bd3494dffa94d890d4a1dcf888e8daa17a51941be5279bf97f0e6d13"
+  },
+  "selected_epoch": 22,
+  "epochs": 24,
+  "best_validation_mae_c": 0.14261846582492105,
+  "engineering_gates": [
+    {
+      "name": "MAE improves >=15% vs bicubic",
+      "passed": true,
+      "observed": 0.27313406053576983,
+      "scope": "matched"
+    },
+    {
+      "name": "Edge error improves >=10% vs bicubic",
+      "passed": true,
+      "observed": 0.23974396916300067,
+      "scope": "matched"
+    },
+    {
+      "name": "All subject groups improve MAE",
+      "passed": true,
+      "observed": 0.2674337094715258,
+      "scope": "matched"
+    },
+    {
+      "name": "All view groups improve MAE",
+      "passed": true,
+      "observed": 0.25596026014545203,
+      "scope": "matched"
+    },
+    {
+      "name": "edge_roi_mae_c no worse than bicubic",
+      "passed": true,
+      "observed": -0.20768755674362183,
+      "scope": "matched"
+    },
+    {
+      "name": "hot_roi_mae_c no worse than bicubic",
+      "passed": true,
+      "observed": -0.09200303256511688,
+      "scope": "matched"
+    },
+    {
+      "name": "Frame MAE P95 no worse than bicubic",
+      "passed": true,
+      "observed": -0.06569445133209229,
+      "scope": "matched"
+    },
+    {
+      "name": "Material regression fraction <=5%",
+      "passed": true,
+      "observed": 0.0,
+      "scope": "matched"
+    },
+    {
+      "name": "Finite outputs in all audited synthetic conditions",
+      "passed": true,
+      "observed": 0,
+      "scope": "all"
+    },
+    {
+      "name": "Stronger degradation mae_c no worse than bicubic",
+      "passed": true,
+      "observed": -0.06701084971427917,
+      "scope": "stronger_blur_noise"
+    },
+    {
+      "name": "Stronger degradation edge_error_c_per_pixel no worse than bicubic",
+      "passed": true,
+      "observed": -0.05221492052078247,
+      "scope": "stronger_blur_noise"
+    }
+  ],
+  "scope": "Historical frozen training and synthetic evaluation; not rerun for this release"
+}

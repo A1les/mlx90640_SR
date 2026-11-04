@@ -1,0 +1,61 @@
+{
+  "inference_backend": "thermal_sr_x2_pytorch",
+  "model_sha256": "e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be",
+  "scope": "Same-input numerical regression; not physical ground-truth validation",
+  "recordings": [
+    {
+      "name": "motion_20261103T033556_003404Z.npz",
+      "frames": 275,
+      "recording_sha256": "811f51148694625ce6449e60695a9dbdbc8a24f32f85e79a04e1e1b3bfc100a8",
+      "checked_array_keys": [
+        "deinterlaced_c",
+        "final_temperature_c",
+        "native_temporal_c",
+        "native_temporal_history_before_c",
+        "pre_cnn_temperature_c",
+        "repair_eligible",
+        "repair_mask",
+        "repair_proposed",
+        "repair_source",
+        "sr_temperature_c",
+        "temporal_alpha",
+        "temporal_history_before_c",
+        "temporal_native_alpha",
+        "temporal_release_mask"
+      ],
+      "byte_identical": true,
+      "states_identical": true,
+      "repaired_samples": 25643,
+      "maximum_absolute_difference_c": 0.0,
+      "native_output_sha256": "5563722692f569fd43a691e9f4cc3a40e141c8337896732c001596147dbe9bcf"
+    },
+    {
+      "name": "static_20261103T034021_165175Z.npz",
+      "frames": 236,
+      "recording_sha256": "a6101a4798d27d87d4af9aec8f8573c2ffa1915d87f6523fb8fa58713aac3a6c",
+      "checked_array_keys": [
+        "deinterlaced_c",
+        "final_temperature_c",
+        "native_temporal_c",
+        "native_temporal_history_before_c",
+        "pre_cnn_temperature_c",
+        "repair_eligible",
+        "repair_mask",
+        "repair_proposed",
+        "repair_source",
+        "sr_temperature_c",
+        "temporal_alpha",
+        "temporal_history_before_c",
+        "temporal_native_alpha",
+        "temporal_release_mask"
+      ],
+      "byte_identical": true,
+      "states_identical": true,
+      "repaired_samples": 0,
+      "maximum_absolute_difference_c": 0.0,
+      "native_output_sha256": "9b537ab60962bd2670799d96c2a85c704f1d11be7ccaf39f174742aec9fc0ec5"
+    }
+  ],
+  "calibration_reproduced": true,
+  "calibration_frames": 98
+}

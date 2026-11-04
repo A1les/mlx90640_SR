@@ -1,0 +1,100 @@
+[
+  {
+    "source": "deinterlace_study_20261102/methods.py",
+    "source_sha256": "42e6581133e62cb237a745655a02804542ba913024de7b9c8aaef15670c649b9",
+    "target": "src/mlx90640_pipeline/core/spatial.py",
+    "changes": "extract current cross kernel; remove historical method runner",
+    "published_target_sha256": "2f92da7345c5321728f5e16d7b1f5dc9dc4170a1d9b1b0d86388300e8cd1f425"
+  },
+  {
+    "source": "deinterlace_study_20261102/expanded_patent.py",
+    "source_sha256": "61a63eff9f9697c35d27a2c02fac805849e6c66a6f1414b97b5458002cdcb74e",
+    "target": "src/mlx90640_pipeline/core/frequency.py",
+    "changes": "LF-normalized source copy",
+    "published_target_sha256": "61a63eff9f9697c35d27a2c02fac805849e6c66a6f1414b97b5458002cdcb74e"
+  },
+  {
+    "source": "deinterlace_study_20261102/motion_repair.py",
+    "source_sha256": "592afd50eab6265617c42828169538848bba956c85fec707acb9ad057de2e12e",
+    "target": "src/mlx90640_pipeline/core/motion.py",
+    "changes": "extract numerical contract; require explicit profile path; rename base class",
+    "published_target_sha256": "37b8efbe187cee98e83379d887e4f370f620377accfb4af6a63ec8b70d4a4168"
+  },
+  {
+    "source": "deinterlace_study_20261102/gap_repair.py",
+    "source_sha256": "2fca2a13d0ad53a2d170f446b076c683d63abfa6e4bd0bb7eb8854c471a2467b",
+    "target": "src/mlx90640_pipeline/core/repair.py",
+    "changes": "extract candidate and constrained FFT functions; freeze tuned75 values in code",
+    "published_target_sha256": "dfa19f15c3d545bf5b2bb7e862c26a1da5de2ed76965eaa9ac40ead517a30ef4"
+  },
+  {
+    "source": "deinterlace_study_20261102/single_repair.py",
+    "source_sha256": "d8ddf5b3955d1160722aff08cfa37c6fe2867fb9ca66da0ed12c8c0804d2275f",
+    "target": "src/mlx90640_pipeline/core/repair.py",
+    "changes": "extract active v3 class and validator; remove historical alternatives",
+    "published_target_sha256": "dfa19f15c3d545bf5b2bb7e862c26a1da5de2ed76965eaa9ac40ead517a30ef4"
+  },
+  {
+    "source": "pi_deployment_20261102/temporal_filter.py",
+    "source_sha256": "021c19c21c2f334da13fe5261850634ed551c91176a2e44f5ab5162ea97cd5c9",
+    "target": "src/mlx90640_pipeline/core/temporal.py",
+    "changes": "LF-normalized source copy",
+    "published_target_sha256": "021c19c21c2f334da13fe5261850634ed551c91176a2e44f5ab5162ea97cd5c9"
+  },
+  {
+    "source": "pi_deployment_20261102/paper_pipeline.py",
+    "source_sha256": "0a4add1aa33f12cfbbc3fa0096522fd73ced2acb97b7d5fb25f40d8ed8bc87c7",
+    "target": "src/mlx90640_pipeline/core/guided_ema.py",
+    "changes": "extract NativeGuidedEMA only",
+    "published_target_sha256": "a175d20f5ed29019d0278884631df601a45d86b040be2e3577cff6be5a610e70"
+  },
+  {
+    "source": "deinterlace_study_20261102/postprocess_pipeline.py",
+    "source_sha256": "10838730419040319e7d0b47cb4818f1d7f34780bc83881c7c05ecc079206a40",
+    "target": "src/mlx90640_pipeline/core/postprocess.py",
+    "changes": "package imports and explicit paths",
+    "published_target_sha256": "e74c9cb6ac809dc4afe246821a9468883a7905c334c2e45f8f749a042210a403"
+  },
+  {
+    "source": "acceptance_20261101/centered_source/model.py",
+    "source_sha256": "f79dfb3a446712608cfeed52e3c24a5540b076d0d793791cc11661b522a884b0",
+    "target": "src/mlx90640_pipeline/model.py",
+    "changes": "LF-normalized source copy",
+    "published_target_sha256": "a2cdebc449c846fc91370216df5dc587a45c9777583a83038e6b63e401f35aaa"
+  },
+  {
+    "source": "acceptance_20261101/centered_source/experiment.py",
+    "source_sha256": "0f5d1474bd3494dffa94d890d4a1dcf888e8daa17a51941be5279bf97f0e6d13",
+    "target": "src/mlx90640_pipeline/training/experiment.py",
+    "changes": "LF-normalized source copy",
+    "published_target_sha256": "0f5d1474bd3494dffa94d890d4a1dcf888e8daa17a51941be5279bf97f0e6d13"
+  },
+  {
+    "source": "acceptance_20261101/centered_source/train.py",
+    "source_sha256": "1a62f2a71d0d44898706431afc9bd7751997513028b6d6c46c3ebaac4a502531",
+    "target": "src/mlx90640_pipeline/training/train.py",
+    "changes": "package imports and explicit paths",
+    "published_target_sha256": "5139ad8aa446ba1877cbce8dd36b84fd9b8644c247b495a2e01201b346e8c1b4"
+  },
+  {
+    "source": "data/subject_splits.csv",
+    "source_sha256": "40abfa5ec91df13333a36f2ef926a156e9943f9a6e4b298afa0e372923e1ca0e",
+    "target": "configs/subject_splits.csv",
+    "changes": "LF-normalized source copy",
+    "published_target_sha256": "27e27dda545f4712ab3b7674b2d56aef20359fbc0ec7413accf4150edb87ffd1"
+  },
+  {
+    "source": "prepare_data.py",
+    "source_sha256": "da56ea6db06c187e36a140f7315389522169513cfcc5c2cf4af92700e9472b7f",
+    "target": "src/mlx90640_pipeline/training/prepare.py",
+    "changes": "Explicit archive/splits/output; verify declared digest; no fixed workspace path; reject nonempty output",
+    "published_target_sha256": "247711041532fbc2154ff0395c1783d31fde4ee03eaf642e85d15951c92f282a"
+  },
+  {
+    "source": "evaluate.py",
+    "source_sha256": "da8bf324ae9a1416b8e736704ec132359d275b972979fec9770ed17e324e82e1",
+    "target": "src/mlx90640_pipeline/training/evaluate.py",
+    "changes": "Package imports; explicit dataset and checkpoint",
+    "published_target_sha256": "990641e10782123a66abdef8e0c55d86370c0fce2b73fbd497ab9e81eb0b1eb8"
+  }
+]

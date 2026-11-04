@@ -1,0 +1,33 @@
+{
+  "selected_model": "seed20261101_centered_c0_e24",
+  "onnx_sha256": "1f8b16619252d806a9511661eb985bb1eb4b63c73467fca8746ee823d79cc617",
+  "checkpoint_sha256": "e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be",
+  "parameters": 16732,
+  "input_shape": [
+    1,
+    1,
+    24,
+    32
+  ],
+  "output_shape": [
+    1,
+    1,
+    48,
+    64
+  ],
+  "unit": "degrees_Celsius",
+  "center_input": true,
+  "loss_weights": {
+    "temperature": 1.0,
+    "edge": 0.2,
+    "consistency": 0.0
+  },
+  "training_reference_temperature_range_c": [
+    26.064401626586914,
+    42.11759948730469
+  ],
+  "source": "Public Lepton synthetic degradation; no real registered MLX-HR supervision",
+  "temperature_accuracy_verified": false,
+  "approved_target": "Raspberry Pi 5 ARM64; existing project interpreter",
+  "original_driver_snapshot_sha256": "f6233243d0e2c85ee8ddc9812645625aca79e05bf710d12f40326899b2988ce8"
+}

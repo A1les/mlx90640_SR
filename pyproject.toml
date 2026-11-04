@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlx90640-thermal-pipeline"
+version = "0.1.0"
+description = "Observation-preserving MLX90640 deinterlacing, adaptive temporal denoising and thermal x2 CNN reconstruction"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "A1les"}]
+dependencies = ["numpy>=1.26,<3", "opencv-python>=4.8,<6"]
+
+[project.optional-dependencies]
+train = ["torch>=2.6,<3", "Pillow>=10,<13", "matplotlib>=3.8,<4"]
+onnx = ["onnxruntime>=1.20,<2"]
+export = ["torch>=2.6,<3", "onnx>=1.16,<2", "onnxscript>=0.2,<1", "onnxruntime>=1.20,<2"]
+pi = ["adafruit-blinka>=8,<9", "adafruit-circuitpython-mlx90640==1.3.9", "onnxruntime>=1.20,<2"]
+
+[project.scripts]
+mlx90640-pipeline = "mlx90640_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

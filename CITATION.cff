@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this project, cite its source release and the original methods and dataset listed in THIRD_PARTY_NOTICES.md."
+type: software
+title: "MLX90640 Thermal Pipeline"
+authors:
+  - name: "A1les"
+version: 0.1.0
+date-released: 2026-11-04
+license: MIT
+abstract: "Observation-preserving motion-adaptive deinterlacing, causal temporal filtering, and temperature-domain x2 CNN reconstruction for MLX90640 research."

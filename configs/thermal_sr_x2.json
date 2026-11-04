@@ -1,0 +1,52 @@
+{
+  "seed": 20261101,
+  "epochs": 24,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "weight_decay": 1e-05,
+  "model": {
+    "channels": 24,
+    "hidden_layers": 3,
+    "center_input": true
+  },
+  "loss_weights": {
+    "temperature": 1.0,
+    "edge": 0.2,
+    "consistency": 0.0
+  },
+  "blur_sigma_choices_hr_pixels": [
+    0.0,
+    0.5,
+    1.0
+  ],
+  "noise_std_uniform_c": [
+    0.0,
+    0.2
+  ],
+  "validation": {
+    "blur_sigma": 0.5,
+    "noise_std_c": 0.1,
+    "seed": 20261102
+  },
+  "test_conditions": [
+    {
+      "name": "matched",
+      "blur_sigma": 0.5,
+      "noise_std_c": 0.1
+    },
+    {
+      "name": "stronger_blur_noise",
+      "blur_sigma": 1.0,
+      "noise_std_c": 0.2
+    },
+    {
+      "name": "outside_training_degradation",
+      "blur_sigma": 1.5,
+      "noise_std_c": 0.3
+    }
+  ],
+  "test_seed": 20261103,
+  "degradation_status": "Initial hypotheses, NOT identified MLX optics/noise calibration.",
+  "reference_status": "Single-sensor Lepton synthetic LR/HR, NOT real MLX/HR supervision.",
+  "normalization_note": "Reversible temperature centering in residual branch only; original Celsius bilinear skip retained. Fixed scale10, no min-max normalization."
+}

@@ -1,0 +1,63 @@
+{
+  "all_relevant_frames_audited": 219243,
+  "archive_sha256": "36020b89e29312ec3fed46b5ea85b9a407a538ba3f8387fea8f4dd153c0c93d8",
+  "manifest_fields_equal": {
+    "native_frame_counts": true,
+    "quality_counts": true,
+    "numeric_temperature_range_c": true,
+    "rejection_counts": true,
+    "eligible_counts": true,
+    "cross_split_exact_duplicate_groups": true
+  },
+  "arrays": {
+    "lepton_hr_c.npy": {
+      "shape": [
+        79895,
+        48,
+        64
+      ],
+      "dtype": "float32",
+      "byte_identical": true
+    },
+    "mlx_lr_c.npy": {
+      "shape": [
+        139348,
+        24,
+        32
+      ],
+      "dtype": "float32",
+      "byte_identical": true
+    },
+    "lepton_eligible.npy": {
+      "shape": [
+        79895
+      ],
+      "dtype": "bool",
+      "byte_identical": true
+    },
+    "mlx90640_eligible.npy": {
+      "shape": [
+        139348
+      ],
+      "dtype": "bool",
+      "byte_identical": true
+    }
+  },
+  "index_files": {
+    "lepton_index.csv": {
+      "byte_identical": true,
+      "records_identical": true
+    },
+    "mlx90640_index.csv": {
+      "byte_identical": true,
+      "records_identical": true
+    },
+    "subject_splits.csv": {
+      "byte_identical": false,
+      "records_identical": true
+    }
+  },
+  "text_normalization": "Published split CSV uses UTF-8 without BOM and LF; CSV records must remain identical.",
+  "scope": "Complete preprocessing regression; manifest creation times and source-path representation are intentionally different",
+  "all_passed": true
+}

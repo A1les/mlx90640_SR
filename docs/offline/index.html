@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MLX90640 Thermal Pipeline · 离线说明</title>
+<style>
+:root{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#172e38;background:#f3f6f5;line-height:1.8}
+*{box-sizing:border-box}body{margin:0}main{max-width:1050px;margin:30px auto;padding:36px 48px;background:white;border:1px solid #dce5e2;border-radius:12px}
+header{border-top:5px solid #166a63;padding-top:20px}h1{font-size:2.1rem;line-height:1.3}h2{font-size:1.65rem}h3{font-size:1.18rem;margin-top:26px}
+p{margin:12px 0}a{color:#086b65;text-underline-offset:.18em}nav{display:flex;gap:10px 22px;flex-wrap:wrap;background:#eaf4ef;padding:15px;margin:24px 0}
+section{border-top:1px solid #d5e0dc;margin-top:34px;padding-top:20px;scroll-margin:15px}pre{overflow:auto;background:#f0f4f5;padding:16px;border-radius:6px;font-size:.87rem;line-height:1.6}
+code{font-family:Consolas,monospace;overflow-wrap:anywhere}.table{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.92rem}th,td{padding:9px 12px;text-align:left;border-bottom:1px solid #dce5e2}th{background:#edf4f0}
+.note{background:#fdf6e9;border-left:4px solid #b58335;padding:12px 17px}.flow{background:#eaf4ef;padding:18px;font-weight:650;color:#134f49;border-radius:6px}.small{font-size:.9rem;color:#526b71}
+footer{border-top:1px solid #dce5e2;margin-top:34px;padding-top:15px}@media(max-width:680px){main{margin:0;padding:20px;border:0;border-radius:0}h1{font-size:1.75rem}}
+@media print{body,main{background:white;margin:0;border:0}nav{display:none}pre{white-space:pre-wrap}h2,h3{break-after:avoid}}
+</style></head><body><main><header><div class="small">SOURCE RELEASE 0.1.0 · 2026-11-04 · MIT</div>
+<h1>MLX90640 温度处理完整说明</h1><p>从原始子页、运动自适应频域去交错，到时间滤波与单帧 CNN 重建。</p>
+<div class="flow">原始温度 32×24 → 保留当前观测的去交错 → 时间 EMA → CNN 64×48</div>
+<p class="small">同时提供先 CNN 后 EMA 的对照；两条顺序共享运动权重。</p>
+<div class="note">本页解释活动 v3 实现。64×48 为重建网格；合成误差与静态波动不能代替真实空间分辨率和测温验证。离线阅读无需联网，外部文献链接需联网打开。</div>
+</header><nav><a href="#algorithms">算法与处理顺序</a><a href="#model-card">CNN 模型</a><a href="#training">数据与训练</a><a href="#data-format">原始数据</a><a href="#raspberry-pi">树莓派运行</a><a href="#validation">验证与边界</a></nav><section id="algorithms"><h2>算法与数据流</h2>
+<p>本文描述活动代码 <code>confirmed_frequency_repair_v3</code> 和共享权重双顺序后处理。图像尺寸按宽×高表示，NumPy 索引为行、列。</p>
+<h3>原始温度与观测保护</h3>
+<p>传感器有 32×24 个位置，每个棋盘子页更新 384 个。完整温度矩阵来自两个先后读取的子页，不能据此宣称全阵列同一时刻积分。采集适配器记录两个 834 字原始子页、控制寄存器、子页编号、读取时间及温度换算参数；Adafruit 的温度换算函数保持原样调用。</p>
+<p>记完整温度矩阵为 R、最新子页掩膜为 C、确认可修补掩膜为 M。M 只能包含较旧子页位置。去交错结果 D 在 M 之外与 R 保持相同 dtype 和原始字节，包括带符号零。该硬约束只属于去交错层，后续 EMA/CNN 是另存的估计。</p>
+<h3>噪声标定</h3>
+<p><code>calibration.fit_profile</code> 在静态录像的指定区间估计逐像元差分尺度与空间残差尺度。MAD 尺度为 1.4826×中位绝对偏差，下限为 1e−8。差分尺度来自相邻完整帧之差；空间尺度来自最新子页十字重建与原始温度的差。两个棋盘奇偶位置分别估计空间尺度。</p>
+<p>默认标定区间为第 5 至 17.5 秒，评分阈值取静态评分的 0.999 分位数。历史标定使用 98 帧。程序要求区间连续、子页时间有效、配置不变，并将设备序列号、EEPROM 哈希和 ADC 分辨率设置写入配置。标定本身不证明拍摄场景静止，采集时必须满足这一前提。</p>
+<h3>运动候选与区域确认</h3>
+<p>对每个旧位置，检测器比较十字重建残差、单次频域残差和相邻完整帧差分。差分按该位置的静态尺度标准化。十字邻居中的有符号变化需要支持空间残差的方向，避免单个高噪声点独自触发。</p>
+<div class="table"><table>
+<tr><th>参数</th><th>活动值</th></tr>
+<tr><td>帧间差分的区域支持</td><td>5×5 内至少 5 个位置超过 2.5 倍差分尺度</td></tr>
+<tr><td>初始种子的区域支持</td><td>7×7 内至少 3 个种子</td></tr>
+<tr><td>十字残差阈值</td><td>0.85 倍空间残差尺度</td></tr>
+<tr><td>频域残差阈值</td><td>1.5 倍频域残差尺度</td></tr>
+<tr><td>频域/十字残差尺度比</td><td>0.28，历史静态拟合预设</td></tr>
+<tr><td>当前帧强确认</td><td>5×5 内至少 3 个差分超过 3.5 倍尺度</td></tr>
+<tr><td>前一帧支持</td><td>5×5 内至少 2 个前帧候选</td></tr>
+</table></div>
+<p>旧像元候选通过临时十字膨胀连接曼哈顿距离为 2 的位置。包含确认支持点的候选连通区域得以保留，但临时桥接点不会成为可写位置。<code>repair_proposed</code> 是候选，<code>repair_eligible</code> 是确认可写集合，<code>repair_mask</code> 是最终实际发生数值改变的位置。</p>
+<h3>约束频域修补</h3>
+<p>FFT 滤波器围绕棋盘奈奎斯特角频率构造周期高斯抑制区域，宽度 0.22 cycles/pixel，抑制强度 0.75，反射扩展 8 像元。频域滤波器保留直流通道；带掩膜的最终写回并不施加整图均温严格不变的额外约束。</p>
+<p>设 K(X)=IFFT(H·FFT(X))，以 X⁰=R 开始，执行 Xᵏ⁺¹=(1−M)R+M K(Xᵏ)。当前共 16 次，同一帧内完成。它使用频域运算及观测约束，没有按照收敛误差自动停止。受限内部估计使用 float32；未选中位置从原始数组直接保留。</p>
+<p>完整帧间隔超过 3/16 秒、子页间隔超过 1.5/16 秒、配置不匹配或时间无效时，修补历史重置，当前帧保持原始值。帧间大于零的单调性和控制寄存器一致性也被检查。</p>
+<h3>时间滤波</h3>
+<p>EMA 为 Yₜ=αₜXₜ+(1−αₜ)Yₜ₋₁。权重从原生去交错图像 D 计算，上下两条顺序共用同一个权重图。</p>
+<p>局部指标为 dilate₃(abs(mean₃(D−G)))，其中 G 是检测器的历史状态。先平均有符号差分，再取绝对值，最后膨胀。基础 α=0.5；指标从 0.9 到 1.8°C 时，α 线性增大至 1。达到上限时局部旁路保持 2 帧。</p>
+<p>相邻 D 的差分经 5×5 平均后，绝对变化超过 1°C 的位置占比大于 3% 时，整帧 α=1 并保持 4 帧；持续触发会续期。去交错确认区域经 3×3 膨胀后，局部 α=1 并保持 2 帧，同时清除该处检测历史。第一帧、时间逆序、时间间断及去交错重置会重新建立历史。</p>
+<p>α=1 表示当前帧直接进入结果和历史。该判断基于温度变化，缓慢低对比运动可能漏检，真实温度突变也可能触发。固定阈值是工程设置，不是从 CNN 训练得到的参数。</p>
+<h3>两种顺序与 CNN</h3>
+<p>上排先 Sₜ=F(Dₜ)，再 Yₜ=α↑Sₜ+(1−α↑)Yₜ₋₁。下排先 Zₜ=αDₜ+(1−α)Zₜ₋₁，再 Vₜ=F(Zₜ)。α↑ 将每个原生权重复制到对应 2×2 输出位置。CNN 非线性和空间邻域运算使两个顺序一般不能交换。整帧 α=1 时，两条结果都等于 F(Dₜ)。局部旁路时，下排 CNN 仍会看到旁边经过时间滤波的输入，不能据单个 α=1 推断局部结果必然相同。</p>
+<p>CNN 由五个 3×3 卷积、四个 ReLU 和 PixelShuffle(2) 构成。通道依次为 1→24→24→24→24→4；最终四通道重排为 1×48×64。网络计算 F(T)=bilinear₂(T)+10×PixelShuffle₂(fθ((T−mean(T))/10))。末层零初始化，使初始模型等于双线性插值。参数总量 16,732。训练来源、损失和验证边界见模型卡与训练文档。</p></section>
+<section id="model-card"><h2>ThermalSRx2 模型卡</h2>
+<h3>身份</h3>
+<p>历史选中模型为 <code>seed20261101_centered_c0_e24</code>。模型从 24 轮训练中按验证集结果选择第 22 轮，参数量为 16,732。源码在 <code>src/mlx90640_pipeline/model.py</code>，配置在 <code>configs/thermal_sr_x2.json</code>。</p>
+<div class="table"><table>
+<tr><th>文件</th><th>SHA256</th></tr>
+<tr><td><code>best.pt</code></td><td><code>e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be</code></td></tr>
+<tr><td><code>selected_model.onnx</code></td><td><code>1f8b16619252d806a9511661eb985bb1eb4b63c73467fca8746ee823d79cc617</code></td></tr>
+</table></div>
+<p>权重不包含在公共源码 ZIP 或 Git 跟踪列表中。作者本地已有的权重可以放在被忽略的 <code>local_assets/</code> 中使用；源码不自动联网下载模型。</p>
+<h3>输入、输出与结构</h3>
+<p>输入为摄氏度 float32 <code>[N,1,24,32]</code>，输出为估计摄氏度 <code>[N,1,48,64]</code>。ONNX 发行模型的 N 固定为 1。输入布局为原始行列排列，不旋转、不翻转、不做颜色归一化。</p>
+<p>卷积通道为 1→24→24→24→24→4，全部 3×3、stride 1、padding 1，前四层后接 ReLU。输出通过 PixelShuffle(2) 重排。网络学习 <code>(T−mean(T))/10</code> 上的残差，并将残差乘 10 后加到原温度的双线性插值上。末层零初始化。该结构没有时序输入，过去帧只在独立 EMA 中使用。</p>
+<h3>数据与目标</h3>
+<p>训练来源为 MlGesture 的 Lepton 温度数据，54,450/13,703/11,742 帧分别用于训练/验证/测试，参与者互不重叠。训练目标为原生 Lepton 图按面积重采样至 64×48 的参考温度图，输入由模拟退化产生。没有真实配准 MLX90640/高分辨率监督，没有利用当前相机的运动录像进行 CNN 配对训练。</p>
+<p>损失权重为温度 1、边缘 0.2、一致性 0。历史验证 MAE 为约 0.1426°C。matched 合成测试相对 bicubic 的 MAE 降低约 27.31%，边缘误差降低约 23.97%。这些值描述相对合成参考的误差，不是绝对测温误差。</p>
+<h3>使用范围</h3>
+<p>该模型用于研究轻量温度图重建和算法顺序。训练场景以车内近室温手部为主，无法仅凭均值中心化推断它对室外、火灾、高温、远距离微小目标均有效。模型不保证热点峰值、细小间隙或温度极值保持，也不对输入观测施加逐像元硬约束。64×48 输出需要通过独立目标、配准、噪声控制和空间分辨率测试才能获得物理性能解释。</p>
+<h3>验证与复现</h3>
+<p>源码迁移后模型结构、参数数量、初始化行为、温度平移性质与反向传播均有自动检查。真实录像回归使用同一个冻结 PyTorch 模型隔离代码整理造成的差异。历史树莓派 ONNX 一致性记录与本次包级回归是不同验证任务；新导出文件应重新执行数值校验和目标设备性能测试。</p></section>
+<section id="training"><h2>数据准备、训练、评价与导出</h2>
+<h3>数据来源与划分</h3>
+<p>从 <a href="https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/home">MlGesture 官方入口</a> 自行取得归档，并遵守发布方使用条件。仓库不内嵌训练图像。当前预处理针对已审查的 <code>MlGesture.zip</code> 版本，SHA256 为 <code>36020b89e29312ec3fed46b5ea85b9a407a538ba3f8387fea8f4dd153c0c93d8</code>。</p>
+<p>程序审查 <code>train_val/frame_data</code> 中两个视角的 Lepton 和 MLX90640 TIFF。两者分别按 signed int16 /100、/10 转为摄氏度。检查形状、数值有效性和跨集合完全重复帧；边缘、端点及孤立跳变仅作为诊断标记，不任意删除真实温度结构。Lepton 160×120 按面积重采样为 64×48 参考目标；MLX90640 仅用于原生输入审查和无配对推理。</p>
+<div class="table"><table>
+<tr><th>集合</th><th>受试者</th><th>Lepton 帧数</th></tr>
+<tr><td>训练</td><td>1,2,4,5,6,7,8,11,12,13,14,15,18,20,22,23</td><td>54,450</td></tr>
+<tr><td>验证</td><td>10,17,21,24</td><td>13,703</td></tr>
+<tr><td>测试</td><td>3,9,16,19</td><td>11,742</td></tr>
+</table></div>
+<p>这些是项目预先固定的受试者划分，并非将官方手势分类训练标签直接用于超分。源归档中 139,348 帧 MLX90640 的 51 帧未通过宽范围数值检查；这些帧没有进入监督训练。数据中不存在已验证的真实 MLX/Lepton 配准真值关系。</p>
+<h3>准备缓存</h3>
+<pre><code>python -m mlx90640_pipeline.training.prepare --archive /path/to/MlGesture.zip --splits configs/subject_splits.csv --output data/mlgesture</code></pre>
+<p>输出 Lepton 参考缓存、MLX 原生缓存、逐帧索引、可用性掩膜、固定划分和完整 manifest。原始归档不修改。目标目录必须为空或尚不存在，程序不会覆盖既有缓存。缓存包含约 1.4 GB 数值数组，应预留额外空间。</p>
+<p>缓存生成时间和路径表示属于 manifest 身份的一部分，因此重新生成的 manifest 哈希通常不同。新训练权重绑定此次 manifest；使用历史权重评价历史数据时需保留与其匹配的原 manifest，不能简单改写校验值来绕过验证。不同缓存内容是否相同应另外比较数组和索引。</p>
+<h3>监督样本与损失</h3>
+<p>对参考温度 H，使用 5×5 高斯模糊、2×2 平均降采样、高斯随机噪声和 0.1°C 量化得到 L。训练模糊标准差在 0、0.5、1.0 中随机选取，噪声标准差从 0–0.2°C 均匀选取。模糊参数和噪声幅值按批次抽取，噪声样本逐元素独立；水平翻转也按批次以 0.5 概率执行。0.1°C 是公开数据的存储步长，不能用作传感器精度声明。</p>
+<p>损失为温度 L1 + 0.2×水平和垂直温差的平均 L1。代码计算并记录降采样一致性误差，但选中配置的权重为 0。实际训练没有对 CNN 输出施加原始 MLX 观测的硬约束。当前模糊/噪声模型为模拟假设，尚未辨识当前设备的真实 PSF 和噪声分布。</p>
+<h3>训练与评价</h3>
+<pre><code>python -m mlx90640_pipeline.training.train --data data/mlgesture --config configs/thermal_sr_x2.json --run runs/thermal_sr_x2 --device cuda
+python -m mlx90640_pipeline.training.evaluate --data data/mlgesture --checkpoint runs/thermal_sr_x2/best.pt --output outputs/test --device cuda</code></pre>
+<p>CPU 运行改为 <code>--device cpu</code>。训练使用 AdamW，初始学习率 0.001，余弦下降至 0.00005，权重衰减 1e−5，批次 128，梯度范数裁剪 1.0，共 24 轮。每轮遍历全部训练样本；按验证 MAE 保存 <code>best.pt</code>，末轮状态保存为 <code>last.pt</code>。继续同配置同数据训练可使用 <code>--resume</code>。</p>
+<p>验证采用固定种子、模糊 0.5 和噪声 0.1°C。测试分别使用 matched(0.5,0.1)、stronger_blur_noise(1.0,0.2)、outside_training_degradation(1.5,0.3)。评价输出逐帧和按受试者/视角/手势分组统计。总体统计按帧加权，不能视作各受试者等权。测试用于最终评价，不参与梯度更新。</p>
+<p>历史选中模型在第 22 轮达到最低验证 MAE，虽然训练计划为 24 轮。新训练受运行环境和算子版本影响，不承诺重新生成相同权重字节。<code>run_metadata.json</code> 记录配置、源文件哈希、数据 manifest 哈希和设备；<code>history.jsonl</code> 记录每轮指标。</p>
+<h3>ONNX 导出</h3>
+<pre><code>python -m pip install &#x27;.[export]&#x27;
+python -m mlx90640_pipeline.training.export --checkpoint runs/thermal_sr_x2/best.pt --output outputs/thermal_sr_x2.onnx</code></pre>
+<p>导出固定形状 float32 摄氏度输入 <code>[1,1,24,32]</code> 和估计摄氏度输出 <code>[1,1,48,64]</code>，opset 18。导出工具执行模型检查和 16 个常量/随机输入的 PyTorch–ONNX 一致性验证，最大差异阈值为 0.001°C。导出成功不等于物理精度通过验证。</p>
+<p>本次整理复核了原冻结权重和训练源代码，执行了数据准备与训练/评价的小样本功能检查；没有为发布整理重新完成一轮 24-epoch 模型选择。具体执行结果见验证目录。</p></section>
+<section id="data-format"><h2>温度录像格式与来源追踪</h2>
+<h3>NPZ 容器</h3>
+<p>读取使用 <code>allow_pickle=False</code>，禁止对象数组。温度数组始终保留摄氏度数值，显示用的 uint8 色彩图不作为数值输入。保存使用同目录临时文件、fsync 和原子硬链接发布，不覆盖已有目标。输出目录所在文件系统需要支持同目录硬链接，常用 ext4 和 NTFS 支持该操作；不支持时保存会明确失败。</p>
+<div class="table"><table>
+<tr><th>字段</th><th>形状/类型</th><th>含义</th></tr>
+<tr><td><code>raw_temperature_c</code></td><td>N×24×32，float64 或 float32</td><td>未经本项目插值/滤波的换算温度；采集入口为 float64</td></tr>
+<tr><td><code>times_s</code></td><td>N，浮点</td><td>进程单调时钟，秒；用于帧间间隔，不是 UTC epoch</td></tr>
+<tr><td><code>raw_subpages_u16</code></td><td>N×2×834，uint16</td><td>每次转换的 832 RAM 字、控制寄存器和子页号</td></tr>
+<tr><td><code>latest_subpage</code></td><td>N，整数 0/1</td><td>第二次转换对应的最新子页</td></tr>
+<tr><td><code>conversion_json</code></td><td>N，Unicode</td><td>两次转换的发射率、反射温度、芯片温度、电源电压、读取 UTC 等</td></tr>
+<tr><td><code>acquired_at_utc</code></td><td>N，Unicode，可选</td><td>完整帧取得后的 UTC 时间</td></tr>
+<tr><td><code>factory_json</code></td><td>标量 Unicode</td><td>设备身份、EEPROM 哈希及工厂信息</td></tr>
+<tr><td><code>metadata_json</code></td><td>标量 Unicode</td><td>格式、单位、算法配置、合成/真实标记、会话起点</td></tr>
+</table></div>
+<p>旧格式可以没有 <code>factory_json</code>，但必须提供旁置的 <code>sensor_factory.json</code>。原始两行 RAM 不能被当成两张完整同步热图；只有对应子页位置属于该次更新。读取时间是主机观察到的转换/读取时间，不是已标定的模拟积分中心。</p>
+<h3>派生数组</h3>
+<p><code>deinterlaced_c</code> 保留原 dtype；其余 CNN/EMA 温度通常为 float32。<code>repair_proposed</code>、<code>repair_eligible</code>、<code>repair_mask</code> 分别表示候选、确认可修补位置和实际发生改写的位置。<code>repair_source</code> 为 0（保留测量）或 3（约束频域估计）。</p>
+<p><code>sr_temperature_c</code> 是 CNN(D)；<code>final_temperature_c</code> 是 EMA(CNN(D))；<code>native_temporal_c</code> 是 EMA(D)；<code>pre_cnn_temperature_c</code> 是 CNN(EMA(D))，此历史字段名表示“CNN 之前做时间滤波”的最终结果，不是 CNN 输入。<code>temporal_native_alpha</code> 为 24×32 权重，<code>temporal_alpha</code> 为复制后的 48×64 权重。两条顺序各自保存更新前历史，便于验证加权公式。</p>
+<h3>分块与回放</h3>
+<p>现场采集默认每 256 帧保存一块，避免无限累积内存；记录包括完整原始数据和启用时的派生结果。跨块实时滤波历史连续，但单独回放一块会从首帧重新建立历史。因此不能要求任意截取文件的首帧派生结果等于原实时状态。每块元数据明确标记这一点。</p>
+<p><code>replay</code> 总是从原始温度重算，不信任缓存中的去交错或 CNN 数组。真实输入必须同时具备两个合法子页、16 Hz 棋盘配置和设备信息。子页间隔不合法时保留原数据并禁用该帧修补。格式错误、非有限温度和不支持的模式会报错。</p>
+<h3>公开范围</h3>
+<p>原始录像可能含现场内容和设备身份，EEPROM 也属于设备专有标定数据。本仓库不将这些文件放入 Git 或公共源码 ZIP。示例使用确定性的合成数据；其 <code>synthetic=True</code>，RAM 数值为零占位，不能用来推导真实温度换算或宣称采集精度。</p></section>
+<section id="raspberry-pi"><h2>树莓派安装与运行</h2>
+<h3>适用环境</h3>
+<p>目标为具有 I2C 的 Raspberry Pi OS 64 位系统和 MLX90640。数值算法固定使用 16 Hz 子页设置、棋盘模式，理想完整帧率上限约 8 FPS。历史装置在 400 kHz I2C 下约 7.85 完整 FPS，这是已有部署记录，不是对所有设备的保证。</p>
+<p>运行前在系统设置启用 I2C，确认用户有设备访问权限。总线速度由操作系统配置，不能依赖 Linux Blinka 的 Python <code>frequency</code> 参数改变总线。历史配置为 <code>dtparam=i2c_arm=on,i2c_arm_baudrate=400000</code>；是否适合当前布线、电容与系统需自行验证。本程序不修改启动配置、不重启系统。</p>
+<pre><code>python -m pip install &#x27;.[pi]&#x27;</code></pre>
+<p>采集适配器固定要求 <code>adafruit-circuitpython-mlx90640==1.3.9</code>，因为它记录该版本私有转换接口的输入。驱动升级需要重新验证。现有环境已满足依赖时直接使用，不必重复安装。</p>
+<h3>先记录静态场景并标定</h3>
+<pre><code>mlx90640-pipeline capture --seconds 30 --output captures/static_session
+mlx90640-pipeline calibrate captures/static_session/capture_0000.npz --start 5 --end 17.5 --output profiles/device_noise.npz</code></pre>
+<p>保持相机与场景静止，避免目标在标定区间变化。工厂标定和转换参数随录像保存，噪声配置绑定当前设备。代码不默认使用作者设备的配置。当前入口对工厂标记坏点的设备明确报错，没有悄悄插值填补测量值。</p>
+<h3>打开完整对照</h3>
+<pre><code>mlx90640-pipeline live --profile profiles/device_noise.npz --onnx /path/to/selected_model.onnx --output captures/live_session --show</code></pre>
+<p>默认是无文字 2×3 顺序对照。<code>--layout stages</code> 改为六阶段视图；<code>--labels</code> 添加标签。<code>Q</code>/Esc 退出、<code>T</code> 切换文字、<code>V</code> 切换布局、<code>S</code> 保存截图。温度色标默认 24–38°C，可用 <code>--low</code>、<code>--high</code> 调整；该操作不截断保存的温度值。</p>
+<p>此公开入口持续分块记录，<code>--seconds 35</code> 可指定一次运动录像长度；没有复制旧展示器的 M/B 按键状态机。推荐运动验证流程为静止 5 秒、慢移 10 秒、快移 10 秒、移出并静止 10 秒。截图对应当时画面，原始数据已在当前分块记录中。</p>
+<h3>单设备读取与资源清理</h3>
+<p>开始前关闭其他 MLX90640 采集进程。入口使用合作锁，并检查可见进程是否已打开 <code>/dev/i2c-1</code>；它不会自动停止其他程序。锁检测受进程可见性和权限限制，不能替代操作层面的单读者要求。<code>--lock-file</code> 可与现有项目统一合作锁路径。</p>
+<p>每次读取有 5 秒超时。错误读取不进入处理历史，累计 5 次错误后停止，不循环重置设备。退出时保存完整帧并释放 I2C 资源。信号处理和 GUI 需要从主线程运行；无桌面时省略 <code>--show</code>。</p>
+<h3>本次验证边界</h3>
+<p>当前发布包数值算法已在真实录像上与原版本核对，采集适配器通过模拟驱动测试，温度换算继续委托固定版本 Adafruit 驱动。<strong>新公开入口尚未在实体树莓派上完成一次独立现场验收</strong>；既有窗口保持原样运行。本地发布整理不应被记作新的硬件性能实验。</p></section>
+<section id="validation"><h2>验证与证据范围</h2>
+<h3>本次代码整理的数值回归</h3>
+<p>使用同一冻结 PyTorch 模型，逐帧比较整理前源文件与包内实现。比较覆盖去交错温度、三个掩膜/来源数组、两条处理顺序、两种网格权重、历史和区域旁路等 14 项数组，以及全部状态标志。275 帧运动录像和 236 帧静态录像全部逐字节相同；原 98 帧标定区间的两个噪声尺度数组和阈值也精确复现。</p>
+<p>完整输入哈希、数组清单和结果见 <a href="../validation/legacy_regression.json">legacy_regression.json</a>。本次输入文件以这些哈希为准；不能将其他同名录像或经过截取的 235 帧记录混作同一个输入。</p>
+<p>可使用自己的历史工程与录像重新执行：</p>
+<pre><code>python tools/compare_legacy.py --study /path/to/legacy/study --release /path/to/legacy/release --profile /path/to/noise.npz --recording /path/to/motion.npz --recording /path/to/static.npz --calibration-recording /path/to/static.npz --checkpoint /path/to/best.pt --output outputs/legacy_regression.json</code></pre>
+<p>也可用 <code>--onnx</code> 替代 <code>--checkpoint</code>，但必须安装对应后端。该检查隔离代码整理造成的变化，不是独立算法优劣或真实精度实验。</p>
+<h3>自动检查</h3>
+<p>检查涵盖最新子页和未选中观测的逐字节保留、错误标定拒绝、子页时间异常、帧间断和逆序重置、静态 EMA 噪声下降、场景突变旁路、两类子页邻域释放、直流场保持、无 pickle 录像往返和不覆盖保存、渲染不修改温度、模型参数量/初始化/平移性质/有限梯度，以及采集适配器对父类转换的保留。</p>
+<p>命令为 <code>python -m unittest discover -s tests -v</code>。基础环境缺少 PyTorch 时相关模型测试明确跳过；发布核查在已有深度学习环境中运行全部测试。检查记录与数据预处理比对见本目录 JSON 报告。</p>
+<div class="table"><table>
+<tr><th>检查</th><th>本次结果</th><th>记录</th></tr>
+<tr><td>原版本回归</td><td>511 帧、14 项数组与全部状态一致</td><td><a href="../validation/legacy_regression.json">回归记录</a></td></tr>
+<tr><td>全量数据准备</td><td>219,243 帧审查，缓存与划分内容一致</td><td><a href="../validation/data_preparation.json">数据记录</a></td></tr>
+<tr><td>自动测试</td><td>13 项通过、0 跳过</td><td><a href="../validation/local_checks.json">环境与测试</a></td></tr>
+<tr><td>训练与评价入口</td><td>合成小样本 1 轮训练及 3 种评价条件通过</td><td><a href="../validation/training_smoke.json">功能检查</a></td></tr>
+<tr><td>安装包与 CLI</td><td>隔离目录导入、冻结 CNN 演示及真实录像回放通过</td><td><a href="../validation/package_checks.json">打包检查</a></td></tr>
+</table></div>
+<p>完整预处理比较保留了数值字节级检查；发布用受试者 CSV 规范为无 BOM 的 UTF-8 与 LF，文本字节不同，但逐条分配记录相同。单轮小样本训练只验证程序连接，不替代历史 24 轮训练与测试结果。GitHub Actions 尚未在远程执行，ONNX 导出和新采集入口的实体设备验收不计入本次已通过项目。</p>
+<h3>历史实验与本次检查的区别</h3>
+<p>历史选中 CNN 的合成 matched 测试相对 bicubic 的 MAE 降低约 27.31%，边缘误差降低约 23.97%。该结果相对于 Lepton 合成参考，不能解释为 MLX 绝对测温精度。历史静态录像中两个顺序的最终平均时间标准差约为 0.2848°C 和 0.2819°C，属于该指定录像的时间稳定性统计。</p>
+<p>源程序曾在树莓派进行实时展示，当前整理后的包级采集入口尚未做新一轮实体设备验收。已完成的离线回归、模型结构检查和模拟驱动检查分别报告，不合并为“全部硬件验收通过”。</p>
+<h3>尚未建立的结论</h3>
+<p>当前没有经过严格同步、配准、辐射标定的 MLX/高分辨率真值对；没有以 ESF/MTF、已知温度目标或黑体试验确认真实分辨率和测温提升；没有以多设备、室外与高温场景证明全场景泛化。整帧 α=1 可以证明该帧不混入 EMA 历史，但无法证明运动检测从不漏检，也无法消除传感器本身的时间混合。</p></section><footer><a href="../../README.md">仓库 README</a> · <a href="../../THIRD_PARTY_NOTICES.md">来源与许可</a> · <a href="../releasing.md">发布说明</a><p class="small">由 tools/build_offline_docs.py 从仓库说明生成。原始 Markdown 文档为内容来源。</p></footer></main></body></html>

@@ -1,0 +1,14 @@
+{
+  "wheel_built": true,
+  "wheel_filename": "mlx90640_thermal_pipeline-0.1.0-py3-none-any.whl",
+  "wheel_sha256": "57a2ca87de002499941a15118f0c4501779f9a65e083102e33c66238e91c1590",
+  "isolated_wheel_import_and_cnn_demo_passed": true,
+  "cnn_demo_frames": 80,
+  "console_entrypoint": "mlx90640-pipeline = mlx90640_pipeline.cli:main",
+  "real_recording_cli_calibration_passed": true,
+  "real_recording_cli_replay_frames": 275,
+  "training_smoke_passed": true,
+  "environment_installed_or_modified": false,
+  "new_virtual_environment_created": false,
+  "scope": "Packaged-code import and command-line integration; no new physical camera run"
+}

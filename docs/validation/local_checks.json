@@ -1,0 +1,19 @@
+{
+  "tests_run": 13,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "passed": true,
+  "python": "3.12.14",
+  "dependencies": {
+    "numpy": "2.5.2",
+    "opencv-python": "5.0.0.93",
+    "torch": "2.11.0+cu128",
+    "Pillow": "12.3.0",
+    "matplotlib": "3.11.2",
+    "setuptools": "78.1.0"
+  },
+  "ci_status": "workflow added, not yet executed on GitHub",
+  "new_hardware_entry_live_tested": false,
+  "onnx_export_executed_this_release": false
+}
