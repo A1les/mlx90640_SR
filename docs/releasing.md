@@ -37,4 +37,4 @@ python tools/package_release.py --output /path/to/new-release-directory
 
 ## 许可与模型
 
-MIT 许可覆盖项目代码和原创说明。第三方资料仅通过引用和安装依赖使用。公开数据和预训练权重若另行发布，需要针对相应数据使用条件单独核实，不应直接把代码 MIT 声明扩展到整个原始数据集。
+MIT 许可覆盖项目代码和原创说明。第三方资料仅通过引用和安装依赖使用。模型参数在 [model-v0.1.0](https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0) 中独立分发，下载 URL、大小、SHA256 及历史原件对应关系保存在 `configs/pretrained.json`。第三方训练图像使用官方获取入口，项目许可不扩展到原始数据集。

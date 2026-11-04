@@ -8,7 +8,7 @@
 
 数据来源为 [KU Leuven EAVISE MlGesture](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/home)。官方页面要求引用 Vandersteegen, Reusen, Van Beeck and Goedemé, *Low-Latency Hand Gesture Recognition With a Low-Resolution Thermal Imager*, CVPR Workshops 2020，[论文入口](https://openaccess.thecvf.com/content_CVPRW_2020/html/w6/Vandersteegen_Low-Latency_Hand_Gesture_Recognition_With_a_Low-Resolution_Thermal_Imager_CVPRW_2020_paper.html)。
 
-截至本次整理，已读取的官方页面和数据 README 未提供可直接核实的独立数据再分发许可。因此源码发行物只提供获取入口、预处理程序、划分和哈希，不重新分发数据。预训练权重也从公开源码发行物中分离，发布权重前应单独核对原数据的使用条件。该说明记录本次核查范围，不对作者未公开的授权作推断。
+第三方训练图像由原作者分发，本仓库提供[官方下载入口](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file)、预处理程序、固定划分与哈希，不镜像原始数据。官方页面要求使用数据时引用上述论文；已读取页面和归档 README 未列出独立的数据再分发许可证。项目训练所得模型另见 [预训练权重发布](https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0)，包含参数与配置，不包含训练图像。项目 MIT 声明不扩展到原数据集。
 
 ## 频域去交错
 

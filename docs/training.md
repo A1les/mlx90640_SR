@@ -2,7 +2,7 @@
 
 ## 数据来源与划分
 
-从 [MlGesture 官方入口](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/home) 自行取得归档，并遵守发布方使用条件。仓库不内嵌训练图像。当前预处理针对已审查的 `MlGesture.zip` 版本，SHA256 为 `36020b89e29312ec3fed46b5ea85b9a407a538ba3f8387fea8f4dd153c0c93d8`。
+从 [MlGesture 官方入口](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/home)或[官方 ZIP 直链](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file)取得归档，并遵守发布方使用条件。直链已于 2026-11-04 验证为可读取的 ZIP，大小为 1,591,541,835 bytes。官方页面的旧 `at_download/file` 链接当前返回 404，实际可用的是 `@@download/file`。仓库不内嵌训练图像。当前预处理针对已审查的 `MlGesture.zip` 版本，SHA256 为 `36020b89e29312ec3fed46b5ea85b9a407a538ba3f8387fea8f4dd153c0c93d8`，机器可读记录见 [dataset.json](../configs/dataset.json)。
 
 程序审查 `train_val/frame_data` 中两个视角的 Lepton 和 MLX90640 TIFF。两者分别按 signed int16 /100、/10 转为摄氏度。检查形状、数值有效性和跨集合完全重复帧；边缘、端点及孤立跳变仅作为诊断标记，不任意删除真实温度结构。Lepton 160×120 按面积重采样为 64×48 参考目标；MLX90640 仅用于原生输入审查和无配对推理。
 

@@ -9,7 +9,9 @@
 | `best.pt` | `e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be` |
 | `selected_model.onnx` | `1f8b16619252d806a9511661eb985bb1eb4b63c73467fca8746ee823d79cc617` |
 
-权重不包含在公共源码 ZIP 或 Git 跟踪列表中。作者本地已有的权重可以放在被忽略的 `local_assets/` 中使用；源码不自动联网下载模型。
+预训练权重通过 [GitHub Release](https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0) 独立提供，不嵌入 Git 源码。下载 [PyTorch 检查点](https://github.com/A1les/mlx90640_SR/releases/download/model-v0.1.0/thermal_sr_x2_epoch22.pt)或[ONNX 推理模型](https://github.com/A1les/mlx90640_SR/releases/download/model-v0.1.0/thermal_sr_x2_epoch22.onnx)，也可使用 `tools/download_model.py` 自动验证大小和 SHA256。完整下载清单见 [pretrained.json](../configs/pretrained.json)。
+
+上表记录历史原件哈希。公开 PyTorch 文件与历史选中检查点逐字节一致。公开 ONNX 删除了节点调试元数据中的工作站路径，计算图与张量字段字节保持不变；公开文件 SHA256 为 `19a880fae99bfaf1d3dcdf4d670244ef3d8b9cf8fa8950a555adecca0c4ca265`，大小为 73,060 bytes。`tools/verify_model_release.py` 对公开下载文件执行 SHA256、输入输出形状及 16 个输入的 CPU PyTorch/ONNX 一致性检查。
 
 ## 输入、输出与结构
 

@@ -1,0 +1,14 @@
+{
+  "name": "MlGesture",
+  "homepage": "https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/home",
+  "download_url": "https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file",
+  "bytes": 1591541835,
+  "sha256": "36020b89e29312ec3fed46b5ea85b9a407a538ba3f8387fea8f4dd153c0c93d8",
+  "checked_on": "2026-11-04",
+  "download_check": "HTTP 206; 1024-byte range starts with ZIP signature; full archive SHA256 verified during original acquisition.",
+  "train_frames": 54450,
+  "validation_frames": 13703,
+  "test_frames": 11742,
+  "supervision": "Lepton-only synthetic LR/HR pairs; MLX frames are not paired ground truth.",
+  "splits": "subject_splits.csv"
+}

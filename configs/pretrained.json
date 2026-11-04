@@ -1,0 +1,37 @@
+{
+  "model_id": "seed20261101_centered_c0_e24",
+  "release_tag": "model-v0.1.0",
+  "release_url": "https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0",
+  "parameters": 16732,
+  "selected_epoch": 22,
+  "input_shape": [
+    1,
+    1,
+    24,
+    32
+  ],
+  "output_shape": [
+    1,
+    1,
+    48,
+    64
+  ],
+  "unit": "degrees_Celsius",
+  "source_checkpoint_sha256": "e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be",
+  "original_onnx_sha256": "1f8b16619252d806a9511661eb985bb1eb4b63c73467fca8746ee823d79cc617",
+  "onnx_change": "Only top-level node debug metadata removed; all computation and tensor field bytes preserved.",
+  "files": {
+    "pt": {
+      "name": "thermal_sr_x2_epoch22.pt",
+      "url": "https://github.com/A1les/mlx90640_SR/releases/download/model-v0.1.0/thermal_sr_x2_epoch22.pt",
+      "bytes": 72149,
+      "sha256": "e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be"
+    },
+    "onnx": {
+      "name": "thermal_sr_x2_epoch22.onnx",
+      "url": "https://github.com/A1les/mlx90640_SR/releases/download/model-v0.1.0/thermal_sr_x2_epoch22.onnx",
+      "bytes": 73060,
+      "sha256": "19a880fae99bfaf1d3dcdf4d670244ef3d8b9cf8fa8950a555adecca0c4ca265"
+    }
+  }
+}
