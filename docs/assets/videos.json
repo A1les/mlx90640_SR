@@ -1,0 +1,109 @@
+{
+  "checkpoint_sha256": "e20cdc8ab3d5d50b6a68dc4bc6119b164e1de57348a3eaf2d2d8fd03330274be",
+  "profile_sha256": "2fb936fa76c0e457ff35ad3ecca05f387b8f98fc3f65e028516d83c5b30455c6",
+  "color_limits_c": [
+    29.5,
+    36.5
+  ],
+  "colormap": "OpenCV INFERNO",
+  "display_enlargement": "nearest-neighbor",
+  "scope": "Offline replay of real MLX recordings.",
+  "order_panels": [
+    "deinterlaced_c",
+    "sr_temperature_c",
+    "final_temperature_c",
+    "deinterlaced_c",
+    "native_temporal_c",
+    "pre_cnn_temperature_c"
+  ],
+  "recordings": {
+    "motion": {
+      "file": "motion_20261103T140119_035916Z.npz",
+      "sha256": "2e50ea8e8c9175ccd15835a4902162cadd7c93168c3d7c7af1e5becdbedd0cd8",
+      "frames": 275,
+      "measured_mean_hz": 7.837333464155473,
+      "deinterlaced_array_sha256": "12fb73c30e4ece62701a7dea7103a2e87569efd436e220174d7555ae8d491791",
+      "current_and_unselected_observation_contract_checked_every_frame": true,
+      "first_displayed_timestamp_s": 0.12742046299536014,
+      "displayed_timestamp_origin": "Recording start; video time zero is the first measurement."
+    },
+    "static": {
+      "file": "static_20261103T034021_165175Z.npz",
+      "sha256": "a6101a4798d27d87d4af9aec8f8573c2ffa1915d87f6523fb8fa58713aac3a6c",
+      "frames": 236,
+      "measured_mean_hz": 7.8520280255858665,
+      "deinterlaced_array_sha256": "9b537ab60962bd2670799d96c2a85c704f1d11be7ccaf39f174742aec9fc0ec5",
+      "current_and_unselected_observation_contract_checked_every_frame": true,
+      "first_displayed_timestamp_s": 0.1274328509998668,
+      "displayed_timestamp_origin": "Recording start; video time zero is the first measurement."
+    }
+  },
+  "videos": {
+    "motion": {
+      "file": "motion_pipeline.mp4",
+      "bytes": 8156117,
+      "sha256": "3464bd40bdd927a87ba38fe1c10524387fc52197f0c857a75a2c2b3bc718758a",
+      "source_frames": 275,
+      "container_frames": 1053,
+      "source_span_s": 34.96087046100001,
+      "last_frame_hold_s": 0.12759862600069027,
+      "duration_s": 35.1,
+      "container_fps": 30,
+      "display_rule": "Hold last measured frame; no frame interpolation; every source frame included.",
+      "maximum_presentation_delay_s": 0.03333333333333333,
+      "codec": "H.264",
+      "pixel_format": "yuv420p",
+      "size_px": [
+        800,
+        524
+      ],
+      "complete_decode_verified": true,
+      "inline_url": "https://github.com/user-attachments/assets/6d720682-5bd0-4d5d-a89c-c866f8283202",
+      "download_url": "https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/motion_pipeline.mp4"
+    },
+    "deinterlacing": {
+      "file": "motion_deinterlacing.mp4",
+      "bytes": 4867778,
+      "sha256": "501804465426a996fa455e3ce9407ca34edfe4efd2f8d915106f9d0eb5e130a0",
+      "source_frames": 275,
+      "container_frames": 1053,
+      "source_span_s": 34.96087046100001,
+      "last_frame_hold_s": 0.12759862600069027,
+      "duration_s": 35.1,
+      "container_fps": 30,
+      "display_rule": "Hold last measured frame; no frame interpolation; every source frame included.",
+      "maximum_presentation_delay_s": 0.03333333333333333,
+      "codec": "H.264",
+      "pixel_format": "yuv420p",
+      "size_px": [
+        664,
+        348
+      ],
+      "complete_decode_verified": true,
+      "inline_url": "https://github.com/user-attachments/assets/160e32c7-00c2-4a24-ab0e-1812c9d2fbe1",
+      "download_url": "https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/motion_deinterlacing.mp4"
+    },
+    "static": {
+      "file": "static_pipeline.mp4",
+      "bytes": 5293093,
+      "sha256": "c5006e50eca8664f237aa8f7e2148561a982a2674c64d85c5d821da09816af34",
+      "source_frames": 236,
+      "container_frames": 902,
+      "source_span_s": 29.92857376899974,
+      "last_frame_hold_s": 0.12735438099934981,
+      "duration_s": 30.066667,
+      "container_fps": 30,
+      "display_rule": "Hold last measured frame; no frame interpolation; every source frame included.",
+      "maximum_presentation_delay_s": 0.03333333333333333,
+      "codec": "H.264",
+      "pixel_format": "yuv420p",
+      "size_px": [
+        800,
+        524
+      ],
+      "complete_decode_verified": true,
+      "inline_url": "https://github.com/user-attachments/assets/54fe28d2-9d0b-457b-8236-0dfc008d0682",
+      "download_url": "https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/static_pipeline.mp4"
+    }
+  }
+}

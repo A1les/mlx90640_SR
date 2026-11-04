@@ -4,21 +4,35 @@
 
 保留最新子页观测，只修补运动区域的较旧像元；在同一输入上比较两种 CNN／时间降噪顺序。提供核心算法、树莓派展示程序、训练代码与预训练权重。
 
-[English](README.en.md) · [下载权重](https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0) · [训练数据](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file) · [运行说明](docs/usage.md) · [自动检查](https://github.com/A1les/mlx90640_SR/actions)
+[English](README.en.md) · [完整视频下载](https://github.com/A1les/mlx90640_SR/releases/tag/video-v0.1.0) · [下载权重](https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0) · [训练数据](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file) · [运行说明](docs/usage.md) · [自动检查](https://github.com/A1les/mlx90640_SR/actions)
 
 ## 实际效果
 
-### 运动去交错
+### 运动视频：两种处理顺序 · 35 秒
 
-![真实 MLX90640 录像：左侧原始温度拼帧，右侧运动自适应去交错](docs/assets/motion_deinterlacing.gif)
+上排：去交错 → CNN → 时间降噪。下排：去交错 → 时间降噪 → CNN。两排从同一个去交错结果开始，使用同一 CNN 权重，连续展示各阶段的运动表现。
 
-左：原始温度拼帧。右：运动自适应频域去交错。取自张开手掌运动录像的 15.0–20.5 秒片段，以原速播放；两图使用相同的 29.5–36.5°C 色标和最近邻显示放大。最新子页和修补掩膜之外的观测保持原值。
+https://github.com/user-attachments/assets/6d720682-5bd0-4d5d-a89c-c866f8283202
 
-### CNN 与时间降噪的顺序对照
+[下载运动对比 MP4 · 8.16 MB](https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/motion_pipeline.mp4)
 
-![同一真实录像、同一 CNN 权重、同一色标的两种处理顺序](docs/assets/pipeline_comparison.png)
+### 运动视频：去交错前后 · 35 秒
 
-上排：去交错 → CNN → 时间降噪。下排：去交错 → 时间降噪 → CNN。各列展示对应阶段的温度阵列，图像放大不参与计算。原始录像与显示参数的哈希见[图像来源记录](docs/assets/showcase.json)。
+左：原始温度拼帧。右：运动自适应频域去交错。最新子页和修补掩膜之外的观测保持原值。
+
+https://github.com/user-attachments/assets/160e32c7-00c2-4a24-ab0e-1812c9d2fbe1
+
+[下载去交错对比 MP4 · 4.87 MB](https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/motion_deinterlacing.mp4)
+
+### 静态视频：时间降噪 · 30 秒
+
+保持相同的 2×3 布局，观察静止手掌和背景的时间波动，以及两种处理顺序的输出。
+
+https://github.com/user-attachments/assets/54fe28d2-9d0b-457b-8236-0dfc008d0682
+
+[下载静态对比 MP4 · 5.29 MB](https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/static_pipeline.mp4)
+
+三段视频均由真实 MLX90640 录像完整回放生成，按原速播放，保留约 7.8 Hz 的实际更新节奏；所有面板固定使用 29.5–36.5°C 色标和最近邻显示放大。[录像来源、时序与 SHA256](docs/videos.md) · [静帧对照](docs/assets/pipeline_comparison.png)
 
 ## 量化结果
 

@@ -4,17 +4,35 @@
 
 The deinterlacer preserves latest-subpage observations and repairs selected older pixels in moving regions. A shared-input 2×3 viewer compares CNN-before-EMA and EMA-before-CNN processing.
 
-[中文](README.md) · [Pretrained weights](https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0) · [Training data](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file) · [Usage](docs/usage.md) · [CI](https://github.com/A1les/mlx90640_SR/actions)
+[中文](README.md) · [Full videos](https://github.com/A1les/mlx90640_SR/releases/tag/video-v0.1.0) · [Pretrained weights](https://github.com/A1les/mlx90640_SR/releases/tag/model-v0.1.0) · [Training data](https://iiw.kuleuven.be/onderzoek/eavise/mlgesture/mlgesture_dataset/@@download/file) · [Usage](docs/usage.md) · [CI](https://github.com/A1les/mlx90640_SR/actions)
 
 ## Results
 
-![Real MLX90640 motion: original assembled temperatures (left), adaptive deinterlacing (right)](docs/assets/motion_deinterlacing.gif)
+### Motion: processing-order comparison · 35 seconds
 
-Real hand-motion recording, 15.0–20.5 s at original speed. Both panels use a fixed 29.5–36.5°C scale and nearest-neighbor display enlargement. Latest-subpage and unselected observations remain unchanged.
+Top: deinterlacing → CNN → EMA. Bottom: deinterlacing → EMA → CNN. Both rows start from the same deinterlaced frame and use the same CNN weights.
 
-![Shared-input CNN/EMA processing-order comparison](docs/assets/pipeline_comparison.png)
+https://github.com/user-attachments/assets/6d720682-5bd0-4d5d-a89c-c866f8283202
 
-Top: deinterlacing → CNN → EMA. Bottom: deinterlacing → EMA → CNN. Same model, input and temperature scale. [Recording and rendering provenance](docs/assets/showcase.json).
+[Download motion comparison · MP4, 8.16 MB](https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/motion_pipeline.mp4)
+
+### Motion: before and after deinterlacing · 35 seconds
+
+Left: original assembled temperatures. Right: motion-adaptive frequency-domain deinterlacing. Latest-subpage and unselected observations remain unchanged.
+
+https://github.com/user-attachments/assets/160e32c7-00c2-4a24-ab0e-1812c9d2fbe1
+
+[Download deinterlacing comparison · MP4, 4.87 MB](https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/motion_deinterlacing.mp4)
+
+### Static scene: temporal denoising · 30 seconds
+
+The same 2×3 layout shows temporal fluctuations in a stationary hand and background, with both processing orders.
+
+https://github.com/user-attachments/assets/54fe28d2-9d0b-457b-8236-0dfc008d0682
+
+[Download static comparison · MP4, 5.29 MB](https://github.com/A1les/mlx90640_SR/releases/download/video-v0.1.0/static_pipeline.mp4)
+
+All videos are complete offline replays of real MLX90640 recordings at original speed, preserving the measured ~7.8 Hz update cadence. All panels share a fixed 29.5–36.5°C scale and nearest-neighbor display enlargement. [Provenance, timing and SHA256](docs/videos.md) · [Still comparison](docs/assets/pipeline_comparison.png).
 
 ## Measurements
 
