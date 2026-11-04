@@ -13,7 +13,7 @@
     "matplotlib": "3.11.2",
     "setuptools": "78.1.0"
   },
-  "ci_status": "workflow added, not yet executed on GitHub",
+  "ci_status_at_local_packaging": "workflow added, not yet executed on GitHub",
   "new_hardware_entry_live_tested": false,
   "onnx_export_executed_this_release": false
 }

@@ -28,7 +28,9 @@ python tools/compare_legacy.py --study /path/to/legacy/study --release /path/to/
 | 训练与评价入口 | 合成小样本 1 轮训练及 3 种评价条件通过 | [功能检查](validation/training_smoke.json) |
 | 安装包与 CLI | 隔离目录导入、冻结 CNN 演示及真实录像回放通过 | [打包检查](validation/package_checks.json) |
 
-完整预处理比较保留了数值字节级检查；发布用受试者 CSV 规范为无 BOM 的 UTF-8 与 LF，文本字节不同，但逐条分配记录相同。单轮小样本训练只验证程序连接，不替代历史 24 轮训练与测试结果。GitHub Actions 尚未在远程执行，ONNX 导出和新采集入口的实体设备验收不计入本次已通过项目。
+完整预处理比较保留了数值字节级检查；发布用受试者 CSV 规范为无 BOM 的 UTF-8 与 LF，文本字节不同，但逐条分配记录相同。单轮小样本训练只验证程序连接，不替代历史 24 轮训练与测试结果。ONNX 导出和新采集入口的实体设备验收不计入本次已通过项目。
+
+2026-11-04，首次公开上传提交 `c4c1b34ecde022f1d1b752c018575bd54277bcfc` 的 GitHub Actions 基础检查和 CPU 模型检查均通过，见[首次远程运行记录](https://github.com/A1les/mlx90640_SR/actions/runs/41799421371)。其中包括基础演示、源码审查、单元测试和合成小样本训练与评价。`local_checks.json` 中的 `ci_status_at_local_packaging` 保留上传前的历史状态；后续提交的检查结果以[对应远程运行](https://github.com/A1les/mlx90640_SR/actions)为准。
 
 ## 历史实验与本次检查的区别
 

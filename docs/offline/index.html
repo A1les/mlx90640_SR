@@ -157,7 +157,8 @@ mlx90640-pipeline calibrate captures/static_session/capture_0000.npz --start 5 -
 <tr><td>训练与评价入口</td><td>合成小样本 1 轮训练及 3 种评价条件通过</td><td><a href="../validation/training_smoke.json">功能检查</a></td></tr>
 <tr><td>安装包与 CLI</td><td>隔离目录导入、冻结 CNN 演示及真实录像回放通过</td><td><a href="../validation/package_checks.json">打包检查</a></td></tr>
 </table></div>
-<p>完整预处理比较保留了数值字节级检查；发布用受试者 CSV 规范为无 BOM 的 UTF-8 与 LF，文本字节不同，但逐条分配记录相同。单轮小样本训练只验证程序连接，不替代历史 24 轮训练与测试结果。GitHub Actions 尚未在远程执行，ONNX 导出和新采集入口的实体设备验收不计入本次已通过项目。</p>
+<p>完整预处理比较保留了数值字节级检查；发布用受试者 CSV 规范为无 BOM 的 UTF-8 与 LF，文本字节不同，但逐条分配记录相同。单轮小样本训练只验证程序连接，不替代历史 24 轮训练与测试结果。ONNX 导出和新采集入口的实体设备验收不计入本次已通过项目。</p>
+<p>2026-11-04，首次公开上传提交 <code>c4c1b34ecde022f1d1b752c018575bd54277bcfc</code> 的 GitHub Actions 基础检查和 CPU 模型检查均通过，见<a href="https://github.com/A1les/mlx90640_SR/actions/runs/41799421371">首次远程运行记录</a>。其中包括基础演示、源码审查、单元测试和合成小样本训练与评价。<code>local_checks.json</code> 中的 <code>ci_status_at_local_packaging</code> 保留上传前的历史状态；后续提交的检查结果以<a href="https://github.com/A1les/mlx90640_SR/actions">对应远程运行</a>为准。</p>
 <h3>历史实验与本次检查的区别</h3>
 <p>历史选中 CNN 的合成 matched 测试相对 bicubic 的 MAE 降低约 27.31%，边缘误差降低约 23.97%。该结果相对于 Lepton 合成参考，不能解释为 MLX 绝对测温精度。历史静态录像中两个顺序的最终平均时间标准差约为 0.2848°C 和 0.2819°C，属于该指定录像的时间稳定性统计。</p>
 <p>源程序曾在树莓派进行实时展示，当前整理后的包级采集入口尚未做新一轮实体设备验收。已完成的离线回归、模型结构检查和模拟驱动检查分别报告，不合并为“全部硬件验收通过”。</p>
